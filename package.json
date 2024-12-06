@@ -1,5 +1,5 @@
 {
-  "name": "@nexus-navigators/api-gateway-agent",
+  "name": "@nexus-navigators/lambda-http-agent",
   "version": "0.0.0",
   "description": "A Node.js http.Agent to invoke Lambda services",
   "main": "src/index.cjs",
