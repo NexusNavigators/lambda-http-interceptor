@@ -16,6 +16,9 @@
     "skipLibCheck": true,
     "noEmit": true,
     "allowImportingTsExtensions": true,
-    "types": ["vitest/globals"],
-  }
+  },
+  "include": [
+    "*.mts",
+    "src/**/*.mts",
+  ]
 }

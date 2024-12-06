@@ -1,5 +1,7 @@
 import { defineConfig } from 'vitest/config'
 import inspector from 'inspector'
+import path from 'path'
+
 // If we are debugging then extend the timeout to max value, otherwise use the default.
 const testTimeout = inspector.url() ? 1e8 : 15e3
 
@@ -26,5 +28,10 @@ export default defineConfig({
     teardownTimeout: testTimeout,
     pool: 'forks',
     globals: true,
+  },
+  resolve: {
+    alias: {
+      '@': path.resolve(import.meta.dirname, 'src'),
+    },
   },
 })
