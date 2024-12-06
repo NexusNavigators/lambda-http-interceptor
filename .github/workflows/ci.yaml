@@ -17,13 +17,17 @@ jobs:
       - name: Test
         run: npm run test
 
-      - run: npx semantic-release --no-ci --debug --dry-run --plugins @semantic-release/commit-analyzer,@semantic-release/release-notes-generator --branches ${{ github.ref || github.ref_name }}
+      - env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npx semantic-release --no-ci --debug --dry-run --plugins @semantic-release/commit-analyzer,@semantic-release/release-notes-generator --branches ${{ github.head_ref || github.ref_name }}
 
       - name: 🔬 Check semantic versioning
         id: semantic-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          GITHUB_REF=${{ github.ref || github.ref_name }}
-          npx semantic-release --no-ci --dry-run --plugins @semantic-release/commit-analyzer,@semantic-release/release-notes-generator --branches ${{ github.ref || github.ref_name }} > output.txt
+          GITHUB_REF=${{ github.head_ref || github.ref_name }}
+          npx semantic-release --no-ci --dry-run --plugins @semantic-release/commit-analyzer,@semantic-release/release-notes-generator --branches ${{ github.head_ref || github.ref_name }} > output.txt
           OUTPUT=$(cat output.txt | base64 -w 0)
           echo "::set-output name=releaseNote::$OUTPUT"
 
