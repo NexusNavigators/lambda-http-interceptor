@@ -1,0 +1,40 @@
+{
+  "name": "@nexus-navigators/lambda-http-agent",
+  "version": "0.0.0",
+  "description": "A Node.js http.Agent to invoke Lambda services",
+  "main": "src/index.js",
+  "author": "David Tanner <david.tanner@nexus-navigators.com>",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "scripts": {
+    "clean": "tsx scripts/clean.mts",
+    "prepublishOnly": "npx tsx scripts/build.mts",
+    "lint": "eslint --cache",
+    "lint:fix": "eslint --cache --fix",
+    "postlint": "npm run tsc",
+    "tsc": "tsc && tsc --project test/tsconfig.json",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.16.0",
+    "@stylistic/eslint-plugin": "^2.11.0",
+    "@types/jscodeshift": "^0.12.0",
+    "@types/node": "^22.10.1",
+    "@vitest/coverage-v8": "^2.1.8",
+    "@vitest/eslint-plugin": "^1.1.14",
+    "conventional-changelog-conventionalcommits": "^8.0.0",
+    "esbuild": "^0.24.0",
+    "eslint": "^9.16.0",
+    "eslint-plugin-import-x": "^4.5.0",
+    "globals": "^15.13.0",
+    "jscodeshift": "^17.1.1",
+    "semantic-release": "^24.2.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "typescript-eslint": "^8.17.0",
+    "vitest": "^2.1.8"
+  }
+}

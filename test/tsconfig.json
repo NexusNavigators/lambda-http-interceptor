@@ -1,0 +1,18 @@
+{
+  "extends": "../tsconfig.json",
+  "include": [
+    "unit/**/*.mts",
+    "../src/**/*.mts",
+  ],
+  "compilerOptions": {
+    "rootDir": "../",
+    "types": [
+      "vitest/globals"
+    ],
+    "paths": {
+      "@/*": [
+        "../src/*"
+      ]
+    }
+  }
+}
