@@ -1,5 +1,5 @@
 export const stream2buffer = async (
-  stream: ReadableStream
+  stream: ReadableStream,
 ): Promise<Buffer> => {
   const buffers = []
   for await (const data of stream) {

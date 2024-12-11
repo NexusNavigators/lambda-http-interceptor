@@ -14,7 +14,7 @@ export const createServer = async () => {
     method: ['GET', 'POST'],
     url: '/test',
     handler: (req, resp) => {
-      const { event } = (req as any).awsLambda;
+      const { event } = (req as any).awsLambda
       routeHandler(req, event)
       let respBody: Buffer | string = 'OK'
       if (req.body && req.headers['content-type'] === binaryType) {
@@ -25,7 +25,7 @@ export const createServer = async () => {
         .type(req.headers['content-type'] ?? 'text/plain')
         .send(respBody)
     },
-  });
+  })
 
   const handler = awsLambdaFastify<APIGatewayProxyEvent, APIGatewayProxyResult>(
     app,
@@ -36,7 +36,7 @@ export const createServer = async () => {
   app.addContentTypeParser(
     [binaryType],
     { parseAs: 'buffer' },
-    ( req, body: Buffer, done) => {
+    (req, body: Buffer, done) => {
       done(null, body.toString('base64'))
     },
   )

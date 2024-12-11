@@ -1,17 +1,22 @@
-import { Context } from 'aws-lambda'
+import type { Context } from 'aws-lambda'
 import { randomUUID } from 'node:crypto'
-import { mock } from 'node:test'
+import { type InstalledClock, install } from '@sinonjs/fake-timers'
 
-import { createContext } from '@src/context.mts'
+import { createContext } from '@src/context.ts'
 
 process.env.TZ = 'UTC'
 
+let clock: InstalledClock
+
 beforeEach(() => {
-  mock.timers.enable({ apis: ['Date'], now: 0 })
+  clock = install({
+    now: 0,
+    toFake: ['Date'],
+  })
 })
 
 afterEach(() => {
-  mock.timers.reset()
+  clock.uninstall()
 })
 
 test('context methods for coverage', () => {
@@ -23,7 +28,7 @@ test('context methods for coverage', () => {
   expect(context.fail('')).toBeUndefined()
   expect(context.succeed('')).toBeUndefined()
   expect(context.getRemainingTimeInMillis()).toBe(3000)
-  mock.timers.tick(1000)
+  clock.tick(1000)
 
   expect(context.getRemainingTimeInMillis()).toBe(2000)
 
@@ -71,9 +76,8 @@ test('override fields', () => {
   })
 
   expect(context.getRemainingTimeInMillis()).toBe(timeout * 1e3)
-  mock.timers.tick(1000)
+  clock.tick(1000)
   expect(context.getRemainingTimeInMillis()).toBe(timeout * 1e3 - 1e3)
-
 
   expect(context).toStrictEqual(expect.objectContaining({
     clientContext,

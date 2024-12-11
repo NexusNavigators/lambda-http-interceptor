@@ -5,7 +5,7 @@ import {
   isBinaryType,
   stream2String,
   type BinaryTypeMatchers,
-} from '../utils/index.mts'
+} from '../utils'
 
 export interface APIGatewayProxyEventParams {
   binaryTypes: BinaryTypeMatchers
@@ -29,7 +29,7 @@ export const toLambdaEvent = async (
   const time = new Date()
   const isBase64Encoded = isBinaryType(request, binaryTypes)
 
-  let body: string | null = null;
+  let body: string | null = null
   if (request.body) {
     body = await stream2String(request.body, isBase64Encoded)
   }
@@ -63,8 +63,8 @@ export const toLambdaEvent = async (
       user: null,
       userAgent: request.headers.get('user-agent'),
       userArn: null,
-    }
-  };
+    },
+  }
 
   const headers: APIGatewayProxyEvent['headers'] = {}
   const multiValueHeaders: APIGatewayProxyEvent['multiValueHeaders'] = {}
@@ -74,7 +74,7 @@ export const toLambdaEvent = async (
       multiValueHeaders[key] = []
     }
     multiValueHeaders[key].push(value)
-  });
+  })
 
   const queryStringParameters: APIGatewayProxyEvent['queryStringParameters'] = {}
   const multiValueQueryStringParameters: APIGatewayProxyEvent['multiValueQueryStringParameters'] = {}
@@ -84,7 +84,7 @@ export const toLambdaEvent = async (
       multiValueQueryStringParameters[key] = []
     }
     multiValueQueryStringParameters[key].push(value)
-  });
+  })
 
   const event: APIGatewayProxyEvent = {
     body,

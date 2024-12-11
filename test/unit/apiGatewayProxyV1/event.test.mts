@@ -2,17 +2,17 @@ import { randomBytes, randomUUID } from 'node:crypto'
 import supertest from 'supertest'
 import { ClientRequestInterceptor } from '@mswjs/interceptors/ClientRequest'
 
-import { toResponse } from '@src/apiGatewayProxyV1/index.mts'
-import { createContext } from '@src/context.mts'
-import { APIGatewayProxyEventParams, toLambdaEvent } from '@src/apiGatewayProxyV1/event.mts'
+import { toResponse } from '@src/apiGatewayProxyV1/index.ts'
+import { createContext } from '@src/context.ts'
+import type { APIGatewayProxyEventParams } from '@src/apiGatewayProxyV1/event.ts'
+import { toLambdaEvent } from '@src/apiGatewayProxyV1/event.ts'
 
 import { createServer } from '@test/testServers/fastifyServerless.mts'
 
 const { handler, app, routeHandler } = await createServer()
 
-let request: ReturnType<typeof supertest>;
-let clientInterceptor: ClientRequestInterceptor;
-clientInterceptor = new ClientRequestInterceptor()
+let request: ReturnType<typeof supertest>
+const clientInterceptor = new ClientRequestInterceptor()
 clientInterceptor.apply()
 
 beforeEach(() => {
@@ -27,8 +27,8 @@ const setupInterceptor = (
   clientInterceptor.once('request', async (
     {
       request,
-      controller
-    }
+      controller,
+    },
   ) => {
     const event = await toLambdaEvent(params, request)
     const resp = await handler(

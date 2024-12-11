@@ -12,7 +12,7 @@ generatedFiles.forEach((filename) => fs.rmSync(filename))
 
 execFileSync('npx', ['tsc', '--project', 'tsconfig.build.json'])
 
-const entryPoints = fs.globSync('src/**/!(*.d).ts', { cwd: rootDir })
+const entryPoints = fs.globSync('src/**/!(*.d).mts', { cwd: rootDir })
 
 const packageString = fs.readFileSync('./package.json', 'utf-8')
 const { engines } = JSON.parse(packageString) as { engines: { node: string } }

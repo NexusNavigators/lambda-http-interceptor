@@ -9,10 +9,10 @@ node_modules/
 .eslintcache
 
 /src/**/*.js
-/src/**/*.mts
-/src/**/*.d.mts
+/src/**/*.mjs
+/src/**/*.d.ts
 /test/**/*.js
-/test/**/*.mts
-/test/**/*.d.mts
+/test/**/*.mjs
+/test/**/*.d.ts
 
 tsconfig.tsbuildinfo

@@ -8,6 +8,11 @@
   "engines": {
     "node": ">=18.20.5"
   },
+  "files": [
+    "src/**/*.js",
+    "src/**/*.mjs",
+    "src/**/*.d.ts"
+  ],
   "publishConfig": {
     "access": "public",
     "provenance": true
@@ -33,9 +38,11 @@
     "@eslint/js": "^9.16.0",
     "@fastify/aws-lambda": "^5.0.0",
     "@nexus-navigators/aws-data-faker": "^1.1.0",
+    "@sinonjs/fake-timers": "^14.0.0",
     "@stylistic/eslint-plugin": "^2.11.0",
     "@types/jscodeshift": "^0.12.0",
     "@types/node": "^22.10.1",
+    "@types/sinonjs__fake-timers": "^8.1.5",
     "@types/supertest": "^6.0.2",
     "@vitest/coverage-v8": "^2.1.8",
     "@vitest/eslint-plugin": "^1.1.14",
