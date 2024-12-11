@@ -5,6 +5,9 @@
   "main": "src/index.js",
   "author": "David Tanner <david.tanner@nexus-navigators.com>",
   "license": "MIT",
+  "engines": {
+    "node": ">=18.20.5"
+  },
   "publishConfig": {
     "access": "public",
     "provenance": true
