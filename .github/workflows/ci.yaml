@@ -5,9 +5,6 @@ on: push
 jobs:
   ci:
     runs-on: ubuntu-latest
-    permissions:
-      issues: write # to be able to comment on released issues
-      pull-requests: write # to be able to comment on released pull requests
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -20,11 +17,11 @@ jobs:
       - name: Test
         run: npm run test
 
-
-      - uses: webiny/action-conventional-commits@v1.3.0
-
       - name: Upload results to Codecov
         uses: codecov/codecov-action@v5
         if: '!cancelled()'
         with:
           token: ${{ secrets.NN_CODECOV_TOKEN }}
+
+
+      - uses: webiny/action-conventional-commits@v1.3.0

@@ -10,8 +10,11 @@
       "vitest/globals"
     ],
     "paths": {
-      "@/*": [
+      "@src/*": [
         "../src/*"
+      ],
+      "@test/*": [
+        "../test/*"
       ]
     }
   }
