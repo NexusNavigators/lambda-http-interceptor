@@ -1,5 +1,6 @@
-import { stream2buffer, stream2String } from '@src/utils/stream.mts'
 import { randomUUID } from 'node:crypto'
+
+import { stream2buffer, stream2String } from '@src/utils/stream.ts'
 
 test('will convert a stream to a buffer', async () => {
   const expected = randomUUID()

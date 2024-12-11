@@ -1,8 +1,8 @@
 {
   "extends": "../tsconfig.json",
   "include": [
-    "unit/**/*.mts",
-    "../src/**/*.mts",
+    "./**/*.mts",
+    "../src/**/*.ts",
   ],
   "compilerOptions": {
     "rootDir": "../",

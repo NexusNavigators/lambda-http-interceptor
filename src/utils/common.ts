@@ -1,5 +1,4 @@
-import { BinaryTypeMatchers } from './types.mts'
-
+import type { BinaryTypeMatchers } from './types.ts'
 
 export const isBinaryType = (
   request: Request,

@@ -1,5 +1,4 @@
-import { BinaryTypeMatchers } from './types.mjs'
-
+import type { BinaryTypeMatchers } from './types.ts'
 
 export const defaultBinaryTypes: BinaryTypeMatchers = [
   'application/octet-stream',

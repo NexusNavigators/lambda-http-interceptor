@@ -1,15 +1,15 @@
-import { Context } from 'aws-lambda'
+import type { Context } from 'aws-lambda'
 import { randomUUID } from 'node:crypto'
 
 type RequiredContext = Pick<Context, 'functionName'>
 type OptionalContext = Omit<Context,
-  | 'done'
-  | 'fail'
-  | 'succeed'
-  | 'logGroupName'
-  | 'getRemainingTimeInMillis'
-  | 'callbackWaitsForEmptyEventLoop'
-  | keyof RequiredContext
+| 'done'
+| 'fail'
+| 'succeed'
+| 'logGroupName'
+| 'getRemainingTimeInMillis'
+| 'callbackWaitsForEmptyEventLoop'
+| keyof RequiredContext
 >
 
 export type PartialContext = RequiredContext & Partial<OptionalContext> & {
@@ -26,7 +26,7 @@ export const createContext = (
     memoryLimitInMB = '256',
     awsRequestId = randomUUID(),
     functionVersion = '$LATEST',
-    timeout = 3
+    timeout = 3,
   }: PartialContext,
 ): Context => {
   const now = new Date()

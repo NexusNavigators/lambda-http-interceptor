@@ -1,13 +1,13 @@
-import { APIGatewayProxyResult } from 'aws-lambda'
+import type { APIGatewayProxyResult } from 'aws-lambda'
 import { randomInt, randomUUID } from 'node:crypto'
 
-import { toResponse } from '@src/apiGatewayProxyV1/index.mts'
-import { stream2String } from '@src/utils/index.mts'
+import { toResponse } from '@src/apiGatewayProxyV1/response.ts'
+import { stream2String } from '@src/utils/index.ts'
 
 test('will ignore missing headers', async () => {
   const response: APIGatewayProxyResult = {
     statusCode: randomInt(200, 600),
-    body: randomUUID()
+    body: randomUUID(),
   }
   const actual = toResponse(response)
   await expect(stream2String(actual.body)).resolves.toBe(response.body)
@@ -26,7 +26,7 @@ test('will convert all headers to strings', () => {
       number: 123,
       boolean: true,
       string: 'string',
-    }
+    },
   }
   const actual = toResponse(response)
   expect(actual.headers.has('number')).toBe(true)
