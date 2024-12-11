@@ -17,6 +17,10 @@
     "access": "public",
     "provenance": true
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/NexusNavigators/lambda-http-interceptor.git"
+  },
   "scripts": {
     "clean": "tsx scripts/clean.mts",
     "prepublishOnly": "npx tsx scripts/build.mts",
