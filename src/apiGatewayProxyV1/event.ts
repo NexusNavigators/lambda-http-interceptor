@@ -5,7 +5,7 @@ import {
   isBinaryType,
   stream2String,
   type BinaryTypeMatchers,
-} from '../utils'
+} from '../utils/index'
 
 export interface APIGatewayProxyEventParams {
   binaryTypes: BinaryTypeMatchers

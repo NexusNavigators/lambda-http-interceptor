@@ -13,13 +13,14 @@ export const createServer = async () => {
   app.route({
     method: ['GET', 'POST'],
     url: '/test',
-    handler: (req, resp) => {
+    handler: async (req, resp) => {
       const { event } = (req as any).awsLambda
       routeHandler(req, event)
       let respBody: Buffer | string = 'OK'
       if (req.body && req.headers['content-type'] === binaryType) {
         respBody = Buffer.from(req.body as string, 'base64')
       }
+      await Promise.resolve()
       return resp
         .code(200)
         .type(req.headers['content-type'] ?? 'text/plain')

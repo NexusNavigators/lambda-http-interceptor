@@ -16,9 +16,11 @@
     "skipLibCheck": true,
     "noEmit": true,
     "allowImportingTsExtensions": true,
+    "isolatedModules": true,
   },
   "include": [
     "*.ts",
     "src/**/*.ts",
+    "scripts/*.mts",
   ]
 }

@@ -1,2 +1,3 @@
-export * from './event.ts'
-export * from './response.ts'
+export * from './event'
+export * from './response'
+export * from './setup'
