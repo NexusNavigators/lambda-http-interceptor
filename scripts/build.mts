@@ -10,9 +10,15 @@ const rootDir = path.resolve(import.meta.dirname, '..')
 
 generatedFiles.forEach((filename) => fs.rmSync(filename))
 
-execFileSync('npx', ['tsc', '--project', 'tsconfig.build.json'])
+try {
+  execFileSync('npx', ['tsc', '--project', 'tsconfig.build.json'])
+} catch (err) {
+  console.log(Buffer.from(err.stdout).toString())
+  console.log(Buffer.from(err.stderr).toString())
+  throw err
+}
 
-const entryPoints = fs.globSync('src/**/!(*.d).mts', { cwd: rootDir })
+const entryPoints = fs.globSync('src/**/!(*.d).ts', { cwd: rootDir })
 
 const packageString = fs.readFileSync('./package.json', 'utf-8')
 const { engines } = JSON.parse(packageString) as { engines: { node: string } }
@@ -46,4 +52,4 @@ await Promise.all([
   }),
 ])
 
-addJsExtensions(`${rootDir}/src`)
+await addJsExtensions(`${rootDir}/src`)

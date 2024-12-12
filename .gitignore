@@ -11,8 +11,12 @@ node_modules/
 /src/**/*.js
 /src/**/*.mjs
 /src/**/*.d.ts
+/src/**/*.d.mts
 /test/**/*.js
 /test/**/*.mjs
 /test/**/*.d.ts
+/test/**/*.d.mts
 
 tsconfig.tsbuildinfo
+
+*.tgz

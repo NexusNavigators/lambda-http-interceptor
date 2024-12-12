@@ -28,6 +28,12 @@ const transformer = (filePath: string, file: string) => {
       value.source = resolveRelativePath(filePath, value.source as Literal)
     })
 
+  // esbuild does not import export alls, so those need to be redone
+  rootSource.find(jsCodeshift.ExportAllDeclaration)
+    .forEach(({ value }) => {
+      value.source = resolveRelativePath(filePath, value.source as Literal)
+    })
+
   rootSource.find(jsCodeshift.CallExpression)
     .forEach(({ value }) => {
       if (value.callee.type === 'Identifier' && value.callee.name === 'require') {
