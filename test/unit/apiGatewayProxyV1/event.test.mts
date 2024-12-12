@@ -1,4 +1,4 @@
-import { addEvent } from '@src/apiGatewayProxyV1/setup.ts'
+import { registerInterception } from '@src/apiGatewayProxyV1/setup.ts'
 import { randomBytes, randomUUID } from 'node:crypto'
 import supertest from 'supertest'
 import { ClientRequestInterceptor } from '@mswjs/interceptors/ClientRequest'
@@ -19,7 +19,7 @@ beforeEach(() => {
 
 describe('toLambdaEvent', () => {
   test('will create the request with defaults', async () => {
-    addEvent({
+    registerInterception({
       once: true,
       eventParams: {
         binaryTypes: [],
@@ -43,7 +43,7 @@ describe('toLambdaEvent', () => {
     const pathParameters: APIGatewayProxyEventParams['pathParameters'] = { [randomUUID()]: randomUUID() }
     const stageVariables: APIGatewayProxyEventParams['stageVariables'] = { [randomUUID()]: randomUUID() }
     const resource: APIGatewayProxyEventParams['resource'] = randomUUID()
-    addEvent({
+    registerInterception({
       once: true,
       eventParams: {
         binaryTypes: [],
@@ -74,7 +74,7 @@ describe('toLambdaEvent', () => {
   })
 
   test('will base64 encode the body', async () => {
-    addEvent({
+    registerInterception({
       once: true,
       eventParams: {
         binaryTypes: ['application/base64'],

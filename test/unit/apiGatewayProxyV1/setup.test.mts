@@ -7,7 +7,7 @@ import {
 } from '@src/apiGatewayProxyV1/index.ts'
 import type { PartialContext } from '@src/context.ts'
 
-import { addEvent } from '@src/apiGatewayProxyV1/setup.ts'
+import { registerInterception } from '@src/apiGatewayProxyV1/setup.ts'
 
 const interceptor = mockType<Interceptor<HttpRequestEventMap>>()
 const controller = mockType<RequestController>()
@@ -29,7 +29,7 @@ const request = new Request(url)
 const invoke = () => expect(handler({ request, controller, requestId: randomUUID() })).resolves.not.toThrow()
 
 test('will call once (%b)', () => {
-  addEvent({
+  registerInterception({
     interceptor,
     eventParams,
     contextParams,
@@ -38,7 +38,7 @@ test('will call once (%b)', () => {
   expect(interceptor.on).toHaveBeenCalledOnce()
   expect(interceptor.once).not.toHaveBeenCalledOnce()
 
-  addEvent({
+  registerInterception({
     interceptor,
     eventParams,
     contextParams,
@@ -48,7 +48,7 @@ test('will call once (%b)', () => {
   expect(interceptor.on).toHaveBeenCalledTimes(2)
   expect(interceptor.once).not.toHaveBeenCalledOnce()
 
-  addEvent({
+  registerInterception({
     interceptor,
     eventParams,
     contextParams,
