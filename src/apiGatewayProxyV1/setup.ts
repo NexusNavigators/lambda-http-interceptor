@@ -68,7 +68,7 @@ export interface APIGatewayProxyV1Options extends APIGatewayProxyV1HandlerOption
   once?: boolean
 }
 
-export const addEvent = (
+export const registerInterception = (
   {
     once = false,
     interceptor,
