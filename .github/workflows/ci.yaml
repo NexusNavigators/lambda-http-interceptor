@@ -12,7 +12,7 @@ jobs:
           - 4566/tcp
         env:
           EAGER_SERVICE_LOADING: 1
-          SERVICES: lambda
+          SERVICES: lambda,s3
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

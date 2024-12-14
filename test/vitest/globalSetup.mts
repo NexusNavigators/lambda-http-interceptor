@@ -23,6 +23,10 @@ export const setup = async () => {
       config: { endpoint },
     } = await startLocalstackDocker({
       versionTag: '4.0.3',
+      envVariables: {
+        Services: 'lambda,s3',
+        EAGER_SERVICE_LOADING: '1',
+      }
     }))
     process.env.LAMBDA_ENDPOINT = endpoint
   }
