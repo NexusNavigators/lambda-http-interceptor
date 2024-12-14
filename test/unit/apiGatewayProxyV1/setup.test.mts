@@ -1,19 +1,22 @@
+import type { AWSLambdaClient } from '@src/utils/aws.ts'
+import { randomInt } from 'crypto'
 import { randomUUID } from 'node:crypto'
-import { mock as mockType } from 'vitest-mock-extended'
+import { mock } from 'vitest-mock-extended'
 import type { HttpRequestEventMap, Interceptor, RequestController } from '@mswjs/interceptors'
 
 import {
-  type APIGatewayProxyEventParams, createInterceptHandler,
+  createInterceptListener,
 } from '@src/apiGatewayProxyV1/index.ts'
-import type { PartialContext } from '@src/context.ts'
+import type { PartialContext, APIGatewayProxyV1EventParams } from '@src/utils/index.ts'
 
-import { registerInterception } from '@src/apiGatewayProxyV1/setup.ts'
+import { registerInterceptListener } from '@src/apiGatewayProxyV1/setup.ts'
 
-const interceptor = mockType<Interceptor<HttpRequestEventMap>>()
-const controller = mockType<RequestController>()
+const interceptor = mock<Interceptor<HttpRequestEventMap>>()
+const controller = mock<RequestController>()
+const awsLambdaClient = mock<AWSLambdaClient>()
 const eventHandler = vitest.fn()
 
-const eventParams: APIGatewayProxyEventParams = {
+const eventParams: APIGatewayProxyV1EventParams = {
   binaryTypes: [],
 }
 
@@ -21,51 +24,82 @@ const contextParams: PartialContext = {
   functionName: 'test',
 }
 
-const handler = createInterceptHandler({ eventParams, contextParams, eventHandler })
-
 const url = new URL('http://localhost:8080/some/path?with=query')
 const request = new Request(url)
 
-const invoke = () => expect(handler({ request, controller, requestId: randomUUID() })).resolves.not.toThrow()
-
 test('will call once (%b)', () => {
-  registerInterception({
+  registerInterceptListener({
     interceptor,
+  },
+  {
+    eventType: 'apiGatewayProxyV1',
+    listenerType: 'handler',
     eventParams,
     contextParams,
     eventHandler,
-  })
+  },
+  )
   expect(interceptor.on).toHaveBeenCalledOnce()
   expect(interceptor.once).not.toHaveBeenCalledOnce()
 
-  registerInterception({
+  registerInterceptListener({
     interceptor,
+    once: false,
+  },
+  {
+    eventType: 'apiGatewayProxyV1',
+    listenerType: 'handler',
     eventParams,
     contextParams,
     eventHandler,
-    once: false,
   })
   expect(interceptor.on).toHaveBeenCalledTimes(2)
   expect(interceptor.once).not.toHaveBeenCalledOnce()
 
-  registerInterception({
+  registerInterceptListener({
     interceptor,
+    once: true,
+  },
+  {
+    eventType: 'apiGatewayProxyV1',
+    listenerType: 'handler',
     eventParams,
     contextParams,
     eventHandler,
-    once: true,
   })
   expect(interceptor.on).toHaveBeenCalledTimes(2)
   expect(interceptor.once).toHaveBeenCalledOnce()
 })
 
-test('will return async', async () => {
+test('will throw with invalid configuration', () => {
+  expect(() => registerInterceptListener({ } as any, {} as any)).toThrow('eventHandler or awsLambdaClient is required')
+})
+
+test('will return if host does not match', async () => {
+  const hostMatcher = 'a bad match'
+  const handler = createInterceptListener({ listenerType: 'handler', eventType: 'apiGatewayProxyV1', eventParams, contextParams, eventHandler, hostMatcher })
+  await expect(handler({ request, controller, requestId: randomUUID() })).resolves.not.toThrow()
+  expect(eventHandler).not.toHaveBeenCalled()
+  expect(controller.respondWith).not.toHaveBeenCalled()
+  expect(controller.errorWith).not.toHaveBeenCalled()
+})
+
+test('will throw if something throws', async () => {
+  const error = new Error('some error')
+  eventHandler.mockRejectedValue(error)
+  const handler = createInterceptListener({ listenerType: 'handler', eventType: 'apiGatewayProxyV1', eventParams, contextParams, eventHandler })
+  await expect(handler({ request, controller, requestId: randomUUID() })).resolves.not.toThrow()
+  expect(controller.errorWith).toHaveBeenCalledWith(error)
+})
+
+test('will invoke the handler and return', async () => {
   eventHandler.mockResolvedValue({
     statusCode: 200,
     body: 'OK',
   })
 
-  await invoke()
+  const handler = createInterceptListener({ listenerType: 'handler', eventType: 'apiGatewayProxyV1', eventParams, contextParams, eventHandler })
+  await expect(handler({ request, controller, requestId: randomUUID() })).resolves.not.toThrow()
 
   expect(eventHandler).toHaveBeenCalledWith(
     expect.objectContaining({
@@ -84,15 +118,25 @@ test('will return async', async () => {
   }))
 })
 
-test('will return callback', async () => {
-  eventHandler.mockImplementation((event, context, cb) => {
-    cb(undefined, {
-      statusCode: 200,
-      body: 'OK',
-    })
+test('will invoke the SDK if provided', async () => {
+  awsLambdaClient.invokeLambda.mockResolvedValue({
+    statusCode: 200,
+    body: 'OK',
   })
-  await invoke()
-  expect(eventHandler).toHaveBeenCalledWith(
+  const functionName = 'test'
+  const qualifier = 'qualifier'
+  const timeout = randomInt(1e3, 2e3)
+  const handler = createInterceptListener({
+    eventType: 'apiGatewayProxyV1',
+    listenerType: 'sdk',
+    eventParams,
+    awsLambdaClient,
+    functionName,
+    qualifier,
+    timeout,
+  })
+  await expect(handler({ request, controller, requestId: randomUUID() })).resolves.not.toThrow()
+  expect(awsLambdaClient.invokeLambda).toHaveBeenCalledWith(
     expect.objectContaining({
       httpMethod: 'GET',
       path: url.pathname,
@@ -100,40 +144,10 @@ test('will return callback', async () => {
         with: 'query',
       },
     }),
-    expect.objectContaining(contextParams),
-    expect.any(Function),
+    expect.objectContaining({
+      functionName,
+      qualifier,
+      timeout,
+    }),
   )
-  expect(controller.respondWith).toHaveBeenCalledWith(expect.objectContaining({
-    status: 200,
-    body: expect.any(ReadableStream),
-  }))
-})
-
-test('will call error if handler rejects', async () => {
-  const error = new Error(randomUUID())
-  eventHandler.mockRejectedValue(error)
-
-  await invoke()
-
-  expect(controller.errorWith).toHaveBeenCalledWith(error)
-})
-
-test('will call error if handler calls callback with an error', async () => {
-  const error = new Error(randomUUID())
-  eventHandler.mockImplementation((event, context, cb) => {
-    cb(error)
-  })
-
-  await invoke()
-
-  expect(controller.errorWith).toHaveBeenCalledWith(error)
-})
-
-test('will call error if the handler returns nothing', async () => {
-  eventHandler.mockImplementation((event, context, cb) => {
-    cb()
-  })
-  await invoke()
-
-  expect(controller.errorWith).toHaveBeenCalledWith(new Error('No response from the Lambda handler'))
 })

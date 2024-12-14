@@ -4,16 +4,8 @@ import { randomUUID } from 'node:crypto'
 import {
   isBinaryType,
   stream2String,
-  type BinaryTypeMatchers,
+  type APIGatewayProxyV1EventParams,
 } from '../utils/index'
-
-export interface APIGatewayProxyEventParams {
-  binaryTypes: BinaryTypeMatchers
-  authorizer?: APIGatewayProxyEvent['requestContext']['authorizer']
-  pathParameters?: APIGatewayProxyEvent['pathParameters']
-  stageVariables?: APIGatewayProxyEvent['stageVariables']
-  resource?: APIGatewayProxyEvent['resource']
-}
 
 export const toLambdaEvent = async (
   {
@@ -22,7 +14,7 @@ export const toLambdaEvent = async (
     pathParameters = null,
     stageVariables = null,
     resource = '',
-  }: APIGatewayProxyEventParams,
+  }: APIGatewayProxyV1EventParams,
   request: Request,
 ): Promise<APIGatewayProxyEvent> => {
   const url = new URL(request.url)

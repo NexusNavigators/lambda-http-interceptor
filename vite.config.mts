@@ -28,6 +28,8 @@ export default defineConfig({
     teardownTimeout: testTimeout,
     pool: 'forks',
     globals: true,
+    globalSetup: [path.join(import.meta.dirname, 'test/vitest/globalSetup.mts')],
+    setupFiles: [path.join(import.meta.dirname, 'test/vitest/setup.mts')],
   },
   resolve: {
     alias: {

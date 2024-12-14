@@ -1,81 +1,63 @@
-import type { HttpRequestEventMap, Interceptor } from '@mswjs/interceptors'
-import type { APIGatewayProxyHandler, APIGatewayProxyResult, Callback } from 'aws-lambda'
-import { createContext, type PartialContext } from '../context'
-import { type APIGatewayProxyEventParams, toLambdaEvent } from './event'
+import type { HttpRequestEventMap } from '@mswjs/interceptors'
+import type { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
+
+import {
+  aws,
+  type RegisterInterceptorHandler,
+  type CreateAPIGatewayV1Listener,
+} from '../utils/index'
+
+import { toLambdaEvent } from './event'
 import { toResponse } from './response'
 
-export interface APIGatewayProxyV1HandlerOptions {
-  eventParams: APIGatewayProxyEventParams
-  contextParams: PartialContext
-  eventHandler: APIGatewayProxyHandler
-}
-
-export const createInterceptHandler = (
+export const createInterceptListener = (
   {
+    hostMatcher,
     eventParams,
-    contextParams,
-    eventHandler,
-  }: APIGatewayProxyV1HandlerOptions,
+    ...handlerOptions
+  }: CreateAPIGatewayV1Listener,
 ) => async (
   {
     request,
     controller,
   }: HttpRequestEventMap['request'][0],
 ) => {
-  const event = await toLambdaEvent(eventParams, request)
-
-  let callbackResolve: ((value: APIGatewayProxyResult | undefined) => void) = undefined as unknown as ((value: APIGatewayProxyResult | undefined) => void)
-  let callbackReject: ((value: Parameters<Callback>[0] | undefined) => void) = undefined as unknown as ((value: Parameters<Callback>[0]) => void)
-
-  const promise = new Promise<APIGatewayProxyResult | undefined>((resolve, reject) => {
-    callbackResolve = resolve
-    callbackReject = reject
-  })
-
-  const callback: Callback<APIGatewayProxyResult> = async (cbErr, cbResp) => {
-    if (cbErr) {
-      callbackReject(cbErr)
-    } else {
-      callbackResolve(cbResp)
-    }
+  if (hostMatcher && !request.url.match(hostMatcher)) {
+    return
   }
-
-  let resp: Awaited<ReturnType<APIGatewayProxyHandler>> = undefined
 
   try {
-    resp = await eventHandler(
-      event,
-      createContext(contextParams),
-      callback,
-    )
-    if (!resp) {
-      resp = await promise
+    const event = await toLambdaEvent(eventParams, request)
+    let promise: Promise<APIGatewayProxyResult>
+    if (handlerOptions.listenerType === 'handler') {
+      promise = aws.invokeHandler(
+        event,
+        handlerOptions,
+      )
     } else {
-      callbackResolve(resp)
+      promise = handlerOptions.awsLambdaClient.invokeLambda<APIGatewayProxyEvent, APIGatewayProxyResult>(
+        event,
+        handlerOptions,
+      )
     }
+    const resp = await promise
+    controller.respondWith(toResponse(resp))
   } catch (err) {
-    return controller.errorWith(err)
+    controller.errorWith(err)
   }
-
-  if (!resp) {
-    return controller.errorWith(new Error('No response from the Lambda handler'))
-  }
-  controller.respondWith(toResponse(resp))
 }
 
-export interface APIGatewayProxyV1Options extends APIGatewayProxyV1HandlerOptions {
-  interceptor: Interceptor<HttpRequestEventMap>
-  once?: boolean
-}
-
-export const registerInterception = (
+export const registerInterceptListener = (
   {
     once = false,
     interceptor,
-    ...handlerOptions
-  }: APIGatewayProxyV1Options,
+  }: RegisterInterceptorHandler,
+  handlerOptions: CreateAPIGatewayV1Listener,
 ) => {
-  const handler = createInterceptHandler(handlerOptions)
+  if (!('eventHandler' in handlerOptions || 'awsLambdaClient' in handlerOptions)) {
+    throw new Error('eventHandler or awsLambdaClient is required')
+  }
+  const handler = createInterceptListener(handlerOptions)
   if (once) {
     interceptor.once('request', handler)
   } else {
