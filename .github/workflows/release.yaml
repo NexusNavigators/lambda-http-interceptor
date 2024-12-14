@@ -17,6 +17,16 @@ jobs:
       issues: write # to be able to comment on released issues
       pull-requests: write # to be able to comment on released pull requests
       id-token: write # to enable use of OIDC for npm provenance
+    services:
+      localstack:
+        image: localstack/localstack:4.0.3
+        ports:
+          - 4566/tcp
+        volumes:
+          - /var/run/docker.sock:/var/run/docker.sock:ro
+        env:
+          EAGER_SERVICE_LOADING: 1
+          SERVICES: lambda,s3
     steps:
       - uses: actions/checkout@v4
         with:
@@ -29,6 +39,8 @@ jobs:
         run: npm ci
       - name: Test
         run: npm run test
+        env:
+          LAMBDA_ENDPOINT: http://localhost:${{ job.services.localstack.ports['4566'] }}
       - name: Verify the integrity of provenance attestations and registry signatures for installed dependencies
         run: npm audit signatures
       - name: Release
