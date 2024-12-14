@@ -31,6 +31,6 @@ test('will set up the interceptor', () => {
     interceptor: expect.any(Interceptor),
     once: undefined,
   },
-    options,
+  options,
   )
 })

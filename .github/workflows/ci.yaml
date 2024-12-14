@@ -25,7 +25,7 @@ jobs:
       - name: Test
         run: npm run test
         env:
-          LAMBDA_ENDPOINT: http://127.0.0.1:${{ job.services.nginx.ports['4566'] }}
+          LAMBDA_ENDPOINT: http://localhost:${{ job.services.localstack.ports['4566'] }}
 
       - run: npm run lint
       - run: npm run prepublishOnly
