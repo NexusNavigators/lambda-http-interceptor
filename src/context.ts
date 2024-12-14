@@ -1,20 +1,6 @@
-import type { Context } from 'aws-lambda'
 import { randomUUID } from 'node:crypto'
-
-type RequiredContext = Pick<Context, 'functionName'>
-type OptionalContext = Omit<Context,
-| 'done'
-| 'fail'
-| 'succeed'
-| 'logGroupName'
-| 'getRemainingTimeInMillis'
-| 'callbackWaitsForEmptyEventLoop'
-| keyof RequiredContext
->
-
-export type PartialContext = RequiredContext & Partial<OptionalContext> & {
-  timeout?: number
-}
+import type { Context } from 'aws-lambda'
+import type { PartialContext } from './utils/index'
 
 export const createContext = (
   {

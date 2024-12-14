@@ -5,6 +5,16 @@ on: push
 jobs:
   ci:
     runs-on: ubuntu-latest
+    services:
+      localstack:
+        image: localstack/localstack:4.0.3
+        ports:
+          - 4566/tcp
+        volumes:
+          - /var/run/docker.sock:/var/run/docker.sock:ro
+        env:
+          EAGER_SERVICE_LOADING: 1
+          SERVICES: lambda,s3
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -16,6 +26,8 @@ jobs:
 
       - name: Test
         run: npm run test
+        env:
+          LAMBDA_ENDPOINT: http://localhost:${{ job.services.localstack.ports['4566'] }}
 
       - run: npm run lint
       - run: npm run prepublishOnly
