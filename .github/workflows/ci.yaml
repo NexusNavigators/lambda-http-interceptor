@@ -5,6 +5,14 @@ on: push
 jobs:
   ci:
     runs-on: ubuntu-latest
+    services:
+      localstack:
+        image: localstack/localstack:4.0.3
+        ports:
+          - 4566/tcp
+        env:
+          EAGER_SERVICE_LOADING: 1
+          SERVICES: lambda
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -16,6 +24,8 @@ jobs:
 
       - name: Test
         run: npm run test
+        env:
+          LAMBDA_ENDPOINT: http://127.0.0.1:${{ job.services.nginx.ports['4566'] }}
 
       - run: npm run lint
       - run: npm run prepublishOnly

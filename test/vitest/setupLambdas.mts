@@ -4,6 +4,7 @@ import semver from 'semver'
 import path from 'path'
 import fs from 'fs'
 import archiver from 'archiver'
+import { pipeline } from 'stream/promises'
 
 import { createFunction } from '@lifeomic/test-tool-lambda'
 
@@ -33,9 +34,11 @@ export const setupLambdas = async () => {
   })
   const output = fs.createWriteStream(zipFilePath)
   const archive = archiver('zip')
-  archive.pipe(output)
   archive.glob('*.js', { cwd: testTmpDir })
-  await archive.finalize()
+  await Promise.all([
+    pipeline(archive, output),
+    archive.finalize(),
+  ])
 
   for (const filename of sourceFiles) {
     const file = path.basename(filename, '.ts')
