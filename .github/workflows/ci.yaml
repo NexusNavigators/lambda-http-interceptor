@@ -10,6 +10,8 @@ jobs:
         image: localstack/localstack:4.0.3
         ports:
           - 4566/tcp
+        volumes:
+          - /var/run/docker.sock:/var/run/docker.sock:ro
         env:
           EAGER_SERVICE_LOADING: 1
           SERVICES: lambda,s3

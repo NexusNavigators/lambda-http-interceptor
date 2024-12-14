@@ -26,7 +26,7 @@ export const setup = async () => {
       envVariables: {
         Services: 'lambda,s3',
         EAGER_SERVICE_LOADING: '1',
-      }
+      },
     }))
     process.env.LAMBDA_ENDPOINT = endpoint
   }
