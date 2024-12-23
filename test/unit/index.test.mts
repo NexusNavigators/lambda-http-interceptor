@@ -1,11 +1,10 @@
 import { Interceptor } from '@mswjs/interceptors'
 import { mock } from 'vitest-mock-extended'
 
-import { enable, clear, registerIntercept } from '@src/index.ts'
+import { enable, clear, registerIntercept, AWSLambdaClient } from '@src/index.ts'
 import {
   registerInterceptListener as registerApiGatewayProxyV1Intercept,
 } from '@src/apiGatewayProxyV1/index.ts'
-import type { AWSLambdaClient } from '@src/utils/aws.ts'
 import type { RegisterInterceptOptions } from '@src/utils/index.ts'
 
 vitest.mock('@src/apiGatewayProxyV1/index.ts')
@@ -33,4 +32,8 @@ test('will set up the interceptor', () => {
   },
   options,
   )
+})
+
+test('exposes the LambdaClient', () => {
+  expect(AWSLambdaClient).toBeDefined()
 })
