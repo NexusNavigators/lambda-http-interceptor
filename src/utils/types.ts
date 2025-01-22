@@ -7,13 +7,13 @@ export type BinaryTypeMatchers = (string | RegExp)[]
 
 type RequiredContext = Pick<Context, 'functionName'>
 type OptionalContext = Omit<Context,
-| 'done'
-| 'fail'
-| 'succeed'
-| 'logGroupName'
-| 'getRemainingTimeInMillis'
-| 'callbackWaitsForEmptyEventLoop'
-| keyof RequiredContext
+  | 'done'
+  | 'fail'
+  | 'succeed'
+  | 'logGroupName'
+  | 'getRemainingTimeInMillis'
+  | 'callbackWaitsForEmptyEventLoop'
+  | keyof RequiredContext
 >
 
 export type PartialContext = RequiredContext & Partial<OptionalContext> & {
