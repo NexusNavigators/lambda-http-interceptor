@@ -1,5 +1,5 @@
 import { fastify } from 'fastify'
-import { awsLambdaFastify } from '@fastify/aws-lambda'
+import { awsLambdaFastify, type LambdaFastifyOptions } from '@fastify/aws-lambda'
 import type { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 
 const app = fastify()
@@ -22,7 +22,7 @@ app.route({
   },
 })
 
-export const handler = awsLambdaFastify<APIGatewayProxyEvent, APIGatewayProxyResult>(
+export const handler = awsLambdaFastify<APIGatewayProxyEvent, LambdaFastifyOptions, APIGatewayProxyResult>(
   app,
   {
     binaryMimeTypes: [binaryType],
