@@ -8,6 +8,8 @@ import {
   registerInterceptListener as registerApiGatewayProxyV1Intercept,
 } from './apiGatewayProxyV1/index.ts'
 
+export { AWSLambdaClient } from './utils/aws.ts'
+
 const interceptor = new BatchInterceptor({
   name: 'lambda-http-interceptor',
   interceptors: nodejs,
