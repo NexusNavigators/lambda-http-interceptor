@@ -1,9 +1,12 @@
 import type { APIGatewayProxyResult } from 'aws-lambda'
+import { nullBodyStatus } from '../utils/index'
 
 export const toResponse = (response: APIGatewayProxyResult): Response => {
-  const body = response.isBase64Encoded
-    ? Buffer.from(response.body, 'base64')
-    : response.body
+  const body = nullBodyStatus.includes(response.statusCode)
+    ? null
+    : response.isBase64Encoded
+      ? Buffer.from(response.body, 'base64')
+      : response.body
 
   const headers: Record<string, string> = {}
 
